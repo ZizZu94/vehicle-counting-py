@@ -1,5 +1,4 @@
-# ------------------------------------------------------ created by: Zihadul
-# Azam --------------------------------
+# ------------------------- created by: Zihadul Azam -------------------
 
 # import libraries
 import numpy as np
@@ -17,12 +16,17 @@ ratio = .45
 cnt_up = 0
 cnt_down = 0
 
+# colors
+heavy_vehicle_color = (0, 165, 255)
+normal_vehicle_color = (0, 255, 0)
+
 # Get width and height of video
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) * ratio
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) * ratio
 
 frameArea = height * width
-areaTH = frameArea / 400 #tracking height
+areaTH = frameArea / 400 # tracking height
+type_of_vehicle_area_treshold = 10000
 
 # Lines (four tracking lines)
 up_limit = int(6 * (height / 10))
@@ -61,7 +65,7 @@ fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=True)
 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
 
 font = cv2.FONT_HERSHEY_DUPLEX
-cars = []
+my_vehicles = []
 max_p_age = 5
 pid = 1
 
@@ -77,7 +81,7 @@ while(cap.isOpened()):
         print("Can't show the video. Exiting ...")
         break
 
-    for i in cars:
+    for i in my_vehicles:
         i.age_one()
 
     # resize image (too big)
@@ -102,14 +106,13 @@ while(cap.isOpened()):
     #dilation = cv2.dilate(c_mask, kernel)
 
     # Find Contours
-    #_, countours0, hierarchy = cv2.findContours(c_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    _, countours0, hierarchy = cv2.findContours(c_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    #_,all_contours, hierarchy = cv2.findContours(c_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    _, all_contours, hierarchy = cv2.findContours(c_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     #---------------------------
-
-    for cnt in countours0:
+    normal_car = True
+    for cnt in all_contours:
         area = cv2.contourArea(cnt)
-        print(area)
         if area > areaTH:
             ####Tracking######
             m = cv2.moments(cnt)
@@ -119,7 +122,7 @@ while(cap.isOpened()):
 
             new = True
             if cy in range(up_limit, down_limit):
-                for i in cars:
+                for i in my_vehicles:
                     if abs(x - i.getX()) <= w and abs(y - i.getY()) <= h:
                         new = False
                         i.updateCoords(cx, cy)
@@ -139,22 +142,36 @@ while(cap.isOpened()):
                         elif i.getDir() == 'up' and i.getY() < up_limit:
                             i.setDone()
                     if i.timedOut():
-                        index = cars.index(i)
-                        cars.pop(index)
+                        index = my_vehicles.index(i)
+                        my_vehicles.pop(index)
                         del i
 
                 if new == True:  # If nothing is detected,create new
                     p = vehicles.Car(pid, cx, cy, max_p_age)
-                    cars.append(p)
+                    my_vehicles.append(p)
                     pid += 1
 
-            cv2.circle(image, (cx, cy), 5, (0, 0, 255), -1)
-            img = cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # classify vehicle by area: <normal, heavy>
+            if area > type_of_vehicle_area_treshold:
+                normal_car = False
+            rect_color = normal_vehicle_color if normal_car else heavy_vehicle_color
 
-    for i in cars:
+            # draw rectangle
+            cv2.circle(image, (cx, cy), 5, (0, 0, 255), -1)
+            img = cv2.rectangle(image, (x, y), (x + w, y + h), rect_color, 2)
+            
+            # draw rectangle lable
+            label = 'Normal' if normal_car else 'Heavy'
+            labelSize, baseLine = cv2.getTextSize(label, font, 0.5, 1)
+            cv2.rectangle(image, (x - 1, y - labelSize[1] - 8), (x + labelSize[0] + 2, y), rect_color, cv2.FILLED)
+            cv2.putText(image, label, (x, y-6), font, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+
+    # print car Id
+    for i in my_vehicles:
         cv2.putText(image, str(i.getId()), (i.getX(), i.getY()),
                     font, 0.3, i.getRGB(), 1, cv2.LINE_AA)
 
+    # print texts and lines
     str_up = 'UP: ' + str(cnt_up)
     str_down = 'DOWN: ' + str(cnt_down)
     image = cv2.polylines(image, [pts_L1], False, line_down_color, thickness=2)
