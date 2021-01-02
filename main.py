@@ -51,6 +51,7 @@ while(cap.isOpened()):
 
     # if frame is read correctly ret is True
     if not ret:
+        print("Total vehicles passed: ", (count_up + count_down))
         print("Can't show the video. Exiting ...")
         break
 
