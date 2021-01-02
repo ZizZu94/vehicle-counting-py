@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>4bff5c6a-c3c8-4470-b8da-1980dcf131d7</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Vehicle_Detection.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,10 +24,10 @@
     <Compile Include="utils.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="vehicles.py">
+    <Compile Include="_vehicles.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Vehicle_Detection.py" />
+    <Compile Include="main.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="samples\" />

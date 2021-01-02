@@ -2,13 +2,13 @@
 
 # import libraries
 import cv2
-import vehicles # class file
+import _vehicles as vehicles # class file
 import utils
 import time
 
 # /#/#/#/#/#/#/#/#/#/#/#/# <> Global Variables /#/#/#/#/#/#/#/#/#/#/#/#
 
-input_video_path = 'samples/sample_3.mp4'
+input_video_path = 'samples/sample_1.mp4'
 cap = cv2.VideoCapture(input_video_path)
 
 ratio = .45
@@ -54,8 +54,8 @@ while(cap.isOpened()):
         print("Can't show the video. Exiting ...")
         break
 
-    for vehicle in my_vehicles:
-        vehicle.age_one()
+    for v in my_vehicles:
+        v.age_one()
 
     # resize image (too big)
     image = cv2.resize(frame, (0, 0), None, ratio, ratio)
@@ -97,33 +97,33 @@ while(cap.isOpened()):
             # if the contour is inside the detection (count) zone
             if cy in range(up_limit, down_limit):
                 # check if current vehicle is already into the list
-                for vehicle in my_vehicles:
-                    if abs(bounding_rect_x - vehicle.getX()) <= bounding_rect_w and abs(bounding_rect_y - vehicle.getY()) <= bounding_rect_h:
+                for v in my_vehicles:
+                    if abs(bounding_rect_x - v.getX()) <= bounding_rect_w and abs(bounding_rect_y - v.getY()) <= bounding_rect_h:
                         new = False
-                        vehicle.updateCoords(cx, cy)
-                        vehicle.updateArea(area)
-                        vehicle.updateType(type_of_vehicle_area_treshold)
+                        v.updateCoords(cx, cy)
+                        v.updateArea(area)
+                        v.updateType(type_of_vehicle_area_treshold)
 
-                        if vehicle.going_UP(line_up) == True:
+                        if v.going_UP(line_up) == True:
                             count_up += 1
-                            count_heavy += 1 if vehicle.type == 'heavy' else 0 
-                            count_normal += 1 if vehicle.type == 'normal' else 0 
-                            print("ID:", vehicle.getId(), 'crossed going [UP] at', time.strftime("%c"))
-                        elif vehicle.going_DOWN(line_down) == True:
+                            count_heavy += 1 if v.type == 'heavy' else 0 
+                            count_normal += 1 if v.type == 'normal' else 0 
+                            print("ID:", v.getId(), 'crossed going [UP] at', time.strftime("%c"))
+                        elif v.going_DOWN(line_down) == True:
                             count_down += 1
-                            count_heavy += 1 if vehicle.type == 'heavy' else 0 
-                            count_normal += 1 if vehicle.type == 'normal' else 0 
-                            print("ID:", vehicle.getId(), 'crossed going [DOWN] at', time.strftime("%c"))
+                            count_heavy += 1 if v.type == 'heavy' else 0 
+                            count_normal += 1 if v.type == 'normal' else 0 
+                            print("ID:", v.getId(), 'crossed going [DOWN] at', time.strftime("%c"))
                         break
                     # set done if current vehicle already passed the up or down detection line
-                    if vehicle.getState() == '1':
-                        if vehicle.getDir() == 'down' and vehicle.getY() > down_limit:
-                            vehicle.setDone()
-                        elif vehicle.getDir() == 'up' and vehicle.getY() < up_limit:
-                            vehicle.setDone()
+                    if v.getState() == '1':
+                        if v.getDir() == 'down' and v.getY() > down_limit:
+                            v.setDone()
+                        elif v.getDir() == 'up' and v.getY() < up_limit:
+                            v.setDone()
                 # create new
                 if new == True:  
-                    new_Vehicle = vehicles.Car(vehicle_id, cx, cy, area, max_vehicle_age)
+                    new_Vehicle = vehicles.Vehicle(vehicle_id, cx, cy, area, max_vehicle_age)
                     my_vehicles.append(new_Vehicle)
                     vehicle_id += 1
 
@@ -136,13 +136,13 @@ while(cap.isOpened()):
             utils.drawVehicleBoundaryRect(image, bounding_rect_x, bounding_rect_y, bounding_rect_w, bounding_rect_h, normal_vehicle)
 
     # Print vehicle Id if not timedOut else delete
-    for vehicle in my_vehicles:
-        if not vehicle.timedOut():
-            utils.printVehicleId(image, vehicle)
+    for v in my_vehicles:
+        if not v.timedOut():
+            utils.printVehicleId(image, v)
         else:
-            index = my_vehicles.index(vehicle)
+            index = my_vehicles.index(v)
             my_vehicles.pop(index)
-            del vehicle
+            del v
             
 
     # Print detection lines
