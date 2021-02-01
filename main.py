@@ -28,7 +28,7 @@ line_down = int(7 * (height / 10))
 down_limit = int(8 * (height / 10))
 
 # Background Subtractor
-fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=True)
+fgbg = cv2.createBackgroundSubtractorMOG2()
 
 # Kernal
 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
@@ -61,9 +61,6 @@ while(cap.isOpened()):
     # resize image (too big)
     image = cv2.resize(frame, (0, 0), None, ratio, ratio)
     
-    # converts image to gray
-    #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
-    
     # subtract frames to take out the changes
     fgmask = fgbg.apply(image)
 
@@ -76,11 +73,7 @@ while(cap.isOpened()):
     # Closing i.e First Dilate then Erode
     c_mask = cv2.morphologyEx(o_mask, cv2.MORPH_CLOSE, kernel)
 
-    # increase the white region in the image.
-    #dilation = cv2.dilate(c_mask, kernel)
-
     # Find Contours
-    #_,all_contours, hierarchy = cv2.findContours(c_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     _, all_contours, hierarchy = cv2.findContours(c_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     normal_vehicle = True

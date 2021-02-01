@@ -1,3 +1,5 @@
+# ------------------------- created by: Zihadul Azam -------------------
+
 from random import randint
 import time
 
@@ -8,7 +10,6 @@ class Vehicle:
         self.x = xi
         self.y = yi
         self.area = area
-        self.tracks = []
         self.R = randint(0,255)
         self.G = randint(0,255)
         self.B = randint(0,255)
@@ -21,8 +22,6 @@ class Vehicle:
 
     def getRGB(self):  #For the RGB colour
         return (self.R,self.G,self.B)
-    def getTracks(self):
-        return self.tracks
 
     def getId(self): #For the ID
         return self.i
