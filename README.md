@@ -3,7 +3,7 @@ The purpose of this project is counting vehicles and classify them by their size
 
 ## Install
 
-Install with [OpenCV](https://pypi.org/project/opencv-python/):
+Install library [OpenCV](https://pypi.org/project/opencv-python/):
 
 ```sh
 install OpenCV
