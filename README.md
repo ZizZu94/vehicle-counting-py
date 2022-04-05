@@ -12,7 +12,7 @@ $ sudo apt-get install python3 python3-pip
 Install library [OpenCV](https://pypi.org/project/opencv-python/):
 
 ```sh
-$ pip install opencv-pytho
+$ pip install opencv-python
 ```
 
 ## Run
